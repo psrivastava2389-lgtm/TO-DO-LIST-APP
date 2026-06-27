@@ -12,24 +12,15 @@ def show_tasks():
         print("No tasks found.\n")
     else:
         print("s.no\tTask\tStatus")
-        for i,task in enumerate(tasks,start=1):
-            print(i, task[1], "Completed" if task[2] else "Not Completed")
-def show_tasks_id():
-
-    curr.execute("select * from tasks")
-    tasks = curr.fetchall()
-    if not tasks:
-        print("No tasks found.\n")
-    else:
-        print("s.no\tTask\tStatus")
-        for i in tasks:
-            print(i[0],i[1], "Completed" if task[2] else "Not Completed")
+        for i,task in enumerate(tasks, start=1):
+            print(i, task[0], "Completed" if task[1] else "Not Completed")
 
 
 
-def add_task(tasks):
+
+def add_task():
     task = input("Enter new task: ")
-    tasks.append(task)
+    
     
     
     print("Task added!\n")
@@ -37,15 +28,23 @@ def add_task(tasks):
     mydb.commit()
 
 
-def delete_task(tasks):
-    show_tasks_id()
+def delete_task():
+    show_tasks()
+    curr.execute("select * from tasks")
+    tasks = curr.fetchall()
+    
+            
     if tasks:
         try:
-            num = int(input("Enter task id to delete: "))
-            if 1 <= num <= len(tasks):
-                removed = tasks.pop(num - 1)
-                print(f"Deleted task: {removed}\n")
-            else:
+            num = int(input("Enter task serial number to delete: "))
+            for i,task in enumerate(tasks, start=1):
+                if i==num:
+                    removed = task[0]
+                    curr.execute("delete from tasks where task_name=%s", (task[0],))
+                    mydb.commit()
+                    print(f"Deleted task: {removed}\n")
+                
+            if num<1 or num>i:
                 print("Invalid task number.\n")
         except ValueError:
             print("Please enter a valid number.\n")
@@ -56,7 +55,7 @@ def delete_task(tasks):
 
 
 def main():
-    tasks = []
+    
     curr.execute("use to_do_list")
     
 
@@ -77,9 +76,9 @@ def main():
         if choice == "1":
             show_tasks()
         elif choice == "2":
-            add_task(tasks)
+            add_task()
         elif choice == "3":
-            delete_task(tasks)
+            delete_task()
         elif choice == "4":
             print("Goodbye!")
             break
