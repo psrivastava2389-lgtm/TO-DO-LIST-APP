@@ -15,9 +15,9 @@ def show_tasks():
     if not tasks:
         print("No tasks found.\n")
     else:
-        print("s.no\tTask\tStatus")
+        print("s.no\tTask\tStatus\tImportant")
         for i,task in enumerate(tasks, start=1):
-            print(i, task[0], "Completed" if task[1] else "Not Completed")
+            print(i, task[0], "Completed" if task[1] else "Not Completed", "important" if task[2] else "not important")
 
 
 
@@ -73,6 +73,32 @@ def edit_task_status():
                 print("enter valid serial number")
         except ValueError:
             print("Please enter a valid number.\n")
+    else: print("no tasks added yet")
+
+
+
+def mark_important():
+    show_tasks()
+    tasks = fetch_data()
+    if tasks:
+        try:
+            num=int(input("Enter task serial number to mark important "))
+           
+            for i,task in enumerate(tasks, start=1):
+                if i==num:
+                    curr.execute("update tasks set important=%s where task_name=%s", (1, task[0]))
+                    mydb.commit()
+            if num<1 or num>i:
+                print("enter valid serial number")
+        except ValueError:
+            print("enter valid number")
+    else:
+        print("no tasks added yet")
+
+    
+
+    
+
 
 
 
@@ -81,19 +107,14 @@ def edit_task_status():
 def main():
     
     curr.execute("use to_do_list")
-    
-
-
-
-    
-
     while True:
         print("==== TO-DO LIST ====")
         print("1. View Tasks")
         print("2. Add Task")
         print("3. Delete Task")
         print("4. Edit status of Task")
-        print("5. Exit")
+        print("5. Mark task important")
+        print("6. Exit")
         
 
         choice = input("Enter your choice: ")
@@ -106,8 +127,11 @@ def main():
             delete_task()
         elif choice == "4":
             edit_task_status()
-
         elif choice == "5":
+            mark_important()
+            
+
+        elif choice == "6":
             print("Goodbye!")
             break
         
