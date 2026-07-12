@@ -23,6 +23,9 @@ def show_tasks():
 
 
 def add_task_db(task, due_date, important):
+    if not task.strip():
+        
+        return
     curr.execute(
         "INSERT INTO tasks (task_name, status, important, due_date) VALUES (%s, %s, %s, %s)",
         (task, 0, important, due_date)

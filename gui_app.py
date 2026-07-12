@@ -42,6 +42,8 @@ def show_tasks(event=None):
     task_list.delete(0, tk.END)
 
     for task, status, imp in tasks:
+        if not task.strip():
+            continue
         label = f"{'⭐ ' if imp else ''}{task} ({   'Completed' if status else 'Not Completed'})"
         task_list.insert(tk.END, label)
 
@@ -59,6 +61,9 @@ def load_all_tasks():
             mark_calendar(date, important)
 
 def mark_calendar(date, important):
+    task=fetch_data_by_date(date)
+    if not task[0][0].strip():
+        return
     if important:
         cal.calevent_create(date, "Important", "important")
         cal.tag_config("important", background="red")
