@@ -42,7 +42,7 @@ def show_tasks(event=None):
     task_list.delete(0, tk.END)
 
     for task, status, imp in tasks:
-        label = f"{'⭐ ' if imp else ''}{task}"
+        label = f"{'⭐ ' if imp else ''}{task} ({   'Completed' if status else 'Not Completed'})"
         task_list.insert(tk.END, label)
 
 cal.bind("<<CalendarSelected>>", show_tasks)
