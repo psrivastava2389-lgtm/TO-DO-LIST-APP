@@ -1,5 +1,5 @@
 import mysql.connector
-mydb = mysql.connector.connect(host="localhost", user="root", password="123456")
+mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
 curr= mydb.cursor()
 def fetch_data():
     curr.execute("select * from tasks")
@@ -22,14 +22,16 @@ def show_tasks():
 
 
 
-def add_task():
-    task = input("Enter new task: ")
-    
-    
-    
-    print("Task added!\n")
-    curr.execute("insert into tasks (task_name,status) values (%s, %s)", (task, 0))
+def add_task_db(task, due_date, important):
+    curr.execute(
+        "INSERT INTO tasks (task_name, status, important, due_date) VALUES (%s, %s, %s, %s)",
+        (task, 0, important, due_date)
+    )
     mydb.commit()
+
+def fetch_data_by_date(date):
+    curr.execute("SELECT task_name, status, important FROM tasks WHERE due_date=%s", (date,))
+    return curr.fetchall()
 
 
 def delete_task():
@@ -68,7 +70,7 @@ def edit_task_status():
                 if i==num:
                     curr.execute("update tasks set status=%s where task_name=%s", (status_input, task[0]))
                     mydb.commit()
-                    print(f"updated status of task :{task[0]} is {"completed" if {task[1]} else "not completed"}")
+                    print(f"updated status of task :{task[0]} is {"completed" if {status_input} else "not completed"}")
             if num<1 or num>i:
                 print("enter valid serial number")
         except ValueError:
@@ -106,7 +108,6 @@ def mark_important():
 
 def main():
     
-    curr.execute("use to_do_list")
     while True:
         print("==== TO-DO LIST ====")
         print("1. View Tasks")
@@ -122,7 +123,7 @@ def main():
         if choice == "1":
             show_tasks()
         elif choice == "2":
-            add_task()
+            add_task_db()
         elif choice == "3":
             delete_task()
         elif choice == "4":
@@ -140,5 +141,5 @@ def main():
             print("Invalid choice. Try again.\n")
 
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+ #   main()
