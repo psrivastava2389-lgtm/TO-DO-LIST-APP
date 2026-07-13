@@ -50,9 +50,9 @@ def show_tasks(event=None,selected_date=None):#it is showing tasks for selected 
     if not tasks:
         return
     else:
-        for task, status, imp,task_id in tasks:
+        for i,(task, status, imp,task_id )in enumerate(tasks,start=1):
             task_ids.append(task_id)  # Store the task ID
-            label = f"{task}{'⭐ ' if imp else ''} ({   'Completed' if status else 'Not Completed'})"
+            label = f"{i}. {task}{'⭐ ' if imp else ''} ({   'Completed' if status else 'Not Completed'})"
             task_list.insert(tk.END, label)
 
 cal.bind("<<CalendarSelected>>", show_tasks)
