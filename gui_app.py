@@ -97,7 +97,7 @@ def mark_complete():
     show_tasks()  # Refresh the task list to reflect the change
 
 
-para_box=tk.text(root,width=50,height=5, font=("Arial", 12))
+para_box=tk.Text(root,width=50,height=5, font=("Arial", 12))
 para_box.pack(pady=10)
 para_box.insert(tk.END, "Double click on a task to mark it as completed or not completed.\n")
 para_box.config(state=tk.DISABLED)  # Make the text box read-only
