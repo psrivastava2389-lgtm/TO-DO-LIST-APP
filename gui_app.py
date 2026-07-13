@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkcalendar import Calendar
-from basic_logic import add_task_db, fetch_data_by_date
+from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status
+task_ids=[]
 
 root = tk.Tk()
 root.title("To-Do Calendar")
@@ -36,16 +37,20 @@ tk.Button(root, text="Add Task", command=add_task).pack()
 # Listbox
 task_list = tk.Listbox(root, width=50)
 task_list.pack(pady=10)
+task_list.bind("<Double-Button-1>", lambda event: mark_complete())  # Bind double-click to mark complete
 
 
-def show_tasks(event=None):#it is showing tasks for selected date in listbox
-    date = cal.get_date()
+def show_tasks(event=None,selected_date=None):#it is showing tasks for selected date in listbox
+    global task_ids
+    date = selected_date if selected_date else cal.get_date()
     task_list.delete(0, tk.END)
+    task_ids.clear()  # Clear the list of task IDs
     tasks = fetch_data_by_date(date)
     if not tasks:
         task_list.insert(tk.END, "No tasks for this date.")
     else:
-        for task, status, imp in tasks:
+        for task_id,task, status, imp in tasks:
+            task_ids.append(task_id)  # Store the task ID
             label = f"{task}{'⭐ ' if imp else ''} ({   'Completed' if status else 'Not Completed'})"
             task_list.insert(tk.END, label)
 
@@ -79,6 +84,24 @@ def mark_single_date(date):#it is telling if any task is important or not for th
         cal.calevent_create(date, "Important", "important")
     else:
         cal.calevent_create(date, "Task", "normal")
+
+
+def mark_complete():
+    selected=task_list.curselection()
+    if not selected:
+        return
+    
+    index=selected[0]
+    task_id=task_ids[index]  # Get the task ID using the index
+    toggle_task_status(task_id)  # Toggle the status in the database
+    show_tasks()  # Refresh the task list to reflect the change
+
+
+para_box=tk.text(root,width=50,height=5, font=("Arial", 12))
+para_box.pack(pady=10)
+para_box.insert(tk.END, "Double click on a task to mark it as completed or not completed.\n")
+para_box.config(state=tk.DISABLED)  # Make the text box read-only
+
 
 
 

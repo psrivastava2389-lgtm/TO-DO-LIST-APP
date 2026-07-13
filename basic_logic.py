@@ -31,8 +31,10 @@ def add_task_db(task, due_date, important):
     mydb.commit()
 
 def fetch_data_by_date(date):
-    curr.execute("SELECT task_name, status, important FROM tasks WHERE due_date=%s", (date,))
+    curr.execute("SELECT id,task_name, status, important FROM tasks WHERE due_date=%s", (date,))
     return curr.fetchall()
+
+
 
 
 def delete_task():
@@ -97,6 +99,20 @@ def mark_important():
             print("enter valid number")
     else:
         print("no tasks added yet")
+
+
+def toggle_task_status(id):
+    curr.execute("select status from tasks where id=%s", (id,))
+    res=curr.fetchone()
+    if not res:
+        return
+    
+    new_status = 0 if res[0] else 1
+
+    curr.execute("update tasks set status=%s where id=%s", (new_status, id))
+    mydb.commit()
+
+
 
     
 
