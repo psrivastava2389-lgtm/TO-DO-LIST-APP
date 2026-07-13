@@ -31,8 +31,12 @@ def add_task_db(task, due_date, important):
     mydb.commit()
 
 def fetch_data_by_date(date):
-    curr.execute("SELECT id,task_name, status, important FROM tasks WHERE due_date=%s", (date,))
+    curr.execute("SELECT task_name, status, important ,id FROM tasks WHERE due_date=%s", (date,))
     return curr.fetchall()
+
+def delete_task_by_id(task_id):
+    curr.execute("DELETE FROM tasks WHERE id=%s", (task_id,))
+    mydb.commit()
 
 
 

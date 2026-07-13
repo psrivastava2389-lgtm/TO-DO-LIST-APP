@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkcalendar import Calendar
-from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status
+from tkinter import messagebox
+from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status,delete_task_by_id,fetch_data
 task_ids=[]
 
 root = tk.Tk()
@@ -47,14 +48,43 @@ def show_tasks(event=None,selected_date=None):#it is showing tasks for selected 
     task_ids.clear()  # Clear the list of task IDs
     tasks = fetch_data_by_date(date)
     if not tasks:
-        task_list.insert(tk.END, "No tasks for this date.")
+        return
     else:
-        for task_id,task, status, imp in tasks:
+        for task, status, imp,task_id in tasks:
             task_ids.append(task_id)  # Store the task ID
             label = f"{task}{'⭐ ' if imp else ''} ({   'Completed' if status else 'Not Completed'})"
             task_list.insert(tk.END, label)
 
 cal.bind("<<CalendarSelected>>", show_tasks)
+
+def delete_task():#deleting task from database and refreshing the listbox and calendar
+    selected = task_list.curselection()
+    if not selected:
+        return
+    index = selected[0]
+    if index >= len(task_ids):
+        messagebox.showerror("Error", "Invalid task selection.")
+        return
+    
+    confirm=messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this task?")
+    if not confirm:
+        return
+    task_id = task_ids[index]  # Get the task ID using the index    
+
+    delete_task_by_id(task_id)  # Delete the task from the database
+    show_tasks()  # Refresh the task list to reflect the change
+    load_all_tasks()  # Refresh the calendar events
+delete_btn = tk.Button(root, text="Delete Task 🗑️", command=delete_task, state="disabled")
+delete_btn.pack(pady=5)
+
+def on_select(event):
+    if task_list.curselection():
+        delete_btn.config(state="normal")
+    else:
+        delete_btn.config(state="disabled")
+task_list.bind("<<ListboxSelect>>", on_select)
+
+    
 
 def load_all_tasks():#marking all tasks in calendar
     from basic_logic import fetch_data
@@ -92,6 +122,9 @@ def mark_complete():
         return
     
     index=selected[0]
+    if index >= len(task_ids):
+        messagebox.showerror("Error", "Invalid task selection.")
+        return
     task_id=task_ids[index]  # Get the task ID using the index
     toggle_task_status(task_id)  # Toggle the status in the database
     show_tasks()  # Refresh the task list to reflect the change
