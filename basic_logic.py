@@ -13,6 +13,8 @@ def fetch_data():
 
 
 
+
+
 def add_task_db(task, due_date, important):
     
     curr.execute(
@@ -30,6 +32,20 @@ def delete_task_by_id(task_id):
     mydb.commit()
 
 
+def edit_task_db(task_id,new_task_name):
+    curr.execute("update tasks set task_name=%s where id=%s", (new_task_name, task_id))
+    mydb.commit()
+
+def toggle_importance_db(task_id):
+    curr.execute("select important from tasks where id=%s", (task_id,))
+    res=curr.fetchone()
+    if not res:
+        return
+    
+    new_importance = 0 if res[0] else 1
+
+    curr.execute("update tasks set important=%s where id=%s", (new_importance, task_id))
+    mydb.commit()
 
 
 

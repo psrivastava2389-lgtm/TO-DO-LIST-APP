@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
-from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status,delete_task_by_id,fetch_data
+from tkinter import simpledialog
+from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status,delete_task_by_id,fetch_data,toggle_importance_db,edit_task_db
 task_ids=[]
 
 root = tk.Tk()
@@ -17,6 +18,10 @@ task_entry = tk.Entry(root, width=30)
 task_entry.pack()
 important_var = tk.IntVar()
 
+
+
+
+
 def add_task():#adding task to database and refreshing the listbox and calendar
     task = task_entry.get()
     if not task.strip():
@@ -29,15 +34,117 @@ def add_task():#adding task to database and refreshing the listbox and calendar
     show_tasks()
     task_entry.delete(0, tk.END)
 
+
+
 # Important checkbox
 tk.Checkbutton(root, text="Important ⭐", variable=important_var).pack()
 tk.Button(root, text="Add Task", command=add_task).pack()
 
-
-
 # Listbox
 task_list = tk.Listbox(root, width=50)
 task_list.pack(pady=10)
+
+
+def delete_task():#deleting task from database and refreshing the listbox and calendar
+    selected = task_list.curselection()
+    if not selected:
+        return
+    index = selected[0]
+    if index >= len(task_ids):
+        messagebox.showerror("Error", "Invalid task selection.")
+        return
+    
+    confirm=messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this task?")
+    if not confirm:
+        return
+    task_id = task_ids[index]  # Get the task ID using the index    
+
+    delete_task_by_id(task_id)  # Delete the task from the database
+    show_tasks()  # Refresh the task list to reflect the change
+    load_all_tasks()  # Refresh the calendar events
+
+
+def mark_complete():
+    selected=task_list.curselection()
+    if not selected:
+        return
+    
+    index=selected[0]
+    if index >= len(task_ids):
+        messagebox.showerror("Error", "Invalid task selection.")
+        return
+    task_id=task_ids[index]  # Get the task ID using the index
+    toggle_task_status(task_id)  # Toggle the status in the database
+    show_tasks()  # Refresh the task list to reflect the change
+    load_all_tasks()  # Refresh the calendar events to reflect the change
+
+
+def edit_task():
+    selected=task_list.curselection()
+    if not selected:
+        return
+    index=selected[0]
+    if index >= len(task_ids):
+        messagebox.showerror("Error", "Invalid task selection.")
+        return
+    task_id=task_ids[index]  
+    new_name=simpledialog.askstring("Edit Task", "Enter new task name:")
+
+    if not new_name or not new_name.strip():
+        messagebox.showerror("Error", "Task name cannot be empty.")
+        return
+    
+    edit_task_db(task_id,new_name.strip())
+    show_tasks()  # Refresh the task list to reflect the change
+    load_all_tasks()  # Refresh the calendar events to reflect the change
+
+
+def toggle_importance():
+    selected=task_list.curselection()
+    if not selected:
+        return
+    index=selected[0]
+    task_id=task_ids[index]
+    toggle_importance_db(task_id)  # Toggle the importance in the database
+    show_tasks()  # Refresh the task list to reflect the change
+    load_all_tasks()  # Refresh the calendar events to reflect the change
+
+
+menu=tk.Menu(root,tearoff=0)
+
+menu.add_command(label="Delete Task 🗑️", command=delete_task)
+menu.add_separator()
+menu.add_command(label="Edit Task ✏️", command=edit_task)
+menu.add_separator()
+menu.add_command(label="Mark Complete/Incomplete ✅", command=mark_complete)
+menu.add_separator()
+menu.add_command(label="Toggle Importance ⭐", command=toggle_importance)
+
+def detect_menu(event):
+    try:
+        index=task_list.nearest(event.y)
+
+        task_list.selection_clear(0, tk.END)
+        task_list.selection_set(index)
+
+        menu.tk_popup(event.x_root, event.y_root)
+    
+    finally:
+        menu.grab_release()
+
+task_list.bind("<Button-3>", detect_menu)  # Right-click to show the menu
+
+
+
+
+
+
+
+
+
+
+
+
 task_list.bind("<Double-Button-1>", lambda event: mark_complete())  # Bind double-click to mark complete
 
 
@@ -57,34 +164,7 @@ def show_tasks(event=None,selected_date=None):#it is showing tasks for selected 
 
 cal.bind("<<CalendarSelected>>", show_tasks)
 
-def delete_task():#deleting task from database and refreshing the listbox and calendar
-    selected = task_list.curselection()
-    if not selected:
-        return
-    index = selected[0]
-    if index >= len(task_ids):
-        messagebox.showerror("Error", "Invalid task selection.")
-        return
-    
-    confirm=messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this task?")
-    if not confirm:
-        return
-    task_id = task_ids[index]  # Get the task ID using the index    
 
-    delete_task_by_id(task_id)  # Delete the task from the database
-    show_tasks()  # Refresh the task list to reflect the change
-    load_all_tasks()  # Refresh the calendar events
-delete_btn = tk.Button(root, text="Delete Task 🗑️", command=delete_task, state="disabled")
-delete_btn.pack(pady=5)
-
-def on_select(event):
-    if task_list.curselection():
-        delete_btn.config(state="normal")
-    else:
-        delete_btn.config(state="disabled")
-task_list.bind("<<ListboxSelect>>", on_select)
-
-    
 
 def load_all_tasks():#marking all tasks in calendar
     from basic_logic import fetch_data
@@ -116,23 +196,20 @@ def mark_single_date(date):#it is telling if any task is important or not for th
         cal.calevent_create(date, "Task", "normal")
 
 
-def mark_complete():
-    selected=task_list.curselection()
-    if not selected:
-        return
-    
-    index=selected[0]
-    if index >= len(task_ids):
-        messagebox.showerror("Error", "Invalid task selection.")
-        return
-    task_id=task_ids[index]  # Get the task ID using the index
-    toggle_task_status(task_id)  # Toggle the status in the database
-    show_tasks()  # Refresh the task list to reflect the change
+
+
+
+
+
+
 
 
 para_box=tk.Text(root,width=50,height=5, font=("Arial", 12))
 para_box.pack(pady=10)
-para_box.insert(tk.END, "Double click on a task to mark it as completed or not completed.\n")
+para_box.insert(tk.END, "1. Double click on a task to mark it as completed or not completed.\n")
+para_box.insert(tk.END," \n")
+para_box.insert(tk.END, "2. Right click to perform task functions.\n")
+
 para_box.config(state=tk.DISABLED)  # Make the text box read-only
 
 
