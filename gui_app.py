@@ -45,7 +45,7 @@ task_list = tk.Listbox(root, width=50)
 task_list.pack(pady=10)
 
 
-def delete_task():#deleting task from database and refreshing the listbox and calendar
+def delete_task(event):#deleting task from database and refreshing the listbox and calendar
     selected = task_list.curselection()
     if not selected:
         return
@@ -62,6 +62,8 @@ def delete_task():#deleting task from database and refreshing the listbox and ca
     delete_task_by_id(task_id)  # Delete the task from the database
     show_tasks()  # Refresh the task list to reflect the change
     load_all_tasks()  # Refresh the calendar events
+
+root.bind("<Delete>",delete_task)  # Bind the Delete key to delete_task function
 
 
 def mark_complete():
@@ -210,6 +212,9 @@ para_box.insert(tk.END, "1. Double click on a task to mark it as completed or no
 para_box.insert(tk.END," \n")
 para_box.insert(tk.END, "2. Right click to perform task functions.\n")
 para_box.insert(tk.END," \n")
+para_box.insert(tk.END, "3. Press the Delete key to delete a task.\n")
+para_box.insert(tk.END," \n")
+
 para_box.config(state=tk.DISABLED)  # Make the text box read-only
 
 
