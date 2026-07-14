@@ -209,7 +209,7 @@ para_box.pack(pady=10)
 para_box.insert(tk.END, "1. Double click on a task to mark it as completed or not completed.\n")
 para_box.insert(tk.END," \n")
 para_box.insert(tk.END, "2. Right click to perform task functions.\n")
-
+para_box.insert(tk.END," \n")
 para_box.config(state=tk.DISABLED)  # Make the text box read-only
 
 
