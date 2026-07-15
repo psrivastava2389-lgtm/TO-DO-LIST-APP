@@ -15,19 +15,19 @@ def fetch_data():
 
 
 
-def add_task_db(task, due_date, important):
+def add_task_db(task, due_date, important,due_time):
     
     curr.execute(
-        "INSERT INTO tasks (task_name, status, important, due_date) VALUES (%s, %s, %s, %s)",
-        (task, 0, important, due_date)
+        "INSERT INTO tasks (task_name, status, important, due_date, due_time) VALUES (%s, %s, %s, %s, %s)",
+        (task, 0, important, due_date, due_time)
     )
     mydb.commit()
 
 def fetch_data_by_date(date):
-    curr.execute("SELECT task_name, status, important ,id FROM tasks WHERE due_date=%s", (date,))
+    curr.execute("SELECT task_name, status, important ,id,due_time FROM tasks WHERE due_date=%s", (date,))
     return curr.fetchall()
 
-def delete_task_by_id(task_id):
+def delete_task_by_id(task_id): 
     curr.execute("DELETE FROM tasks WHERE id=%s", (task_id,))
     mydb.commit()
 
@@ -47,6 +47,10 @@ def toggle_importance_db(task_id):
     curr.execute("update tasks set important=%s where id=%s", (new_importance, task_id))
     mydb.commit()
 
+def edit_due_time_db(task_id,new_time):
+    curr.execute("update tasks set due_time=%s where id=%s",(new_time,task_id))
+    mydb.commit()
+    
 
 
 

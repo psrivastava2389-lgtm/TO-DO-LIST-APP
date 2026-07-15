@@ -2,7 +2,7 @@ import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
 from tkinter import simpledialog
-from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status,delete_task_by_id,fetch_data,toggle_importance_db,edit_task_db
+from basic_logic import add_task_db, fetch_data_by_date,toggle_task_status,delete_task_by_id,fetch_data,toggle_importance_db,edit_task_db,edit_due_time_db
 task_ids=[]
 
 root = tk.Tk()
@@ -18,21 +18,73 @@ task_entry = tk.Entry(root, width=30)
 task_entry.pack()
 important_var = tk.IntVar()
 
+def open_time_picker():
+    global selected_time
+    global popup
+    popup = tk.Toplevel(root)
+    popup.title("Select Due Time For Task")
+    popup.geometry("250x150")
+
+    hour_var = tk.StringVar(value="12")
+    minute_var = tk.StringVar(value="00")
+    ampm_var = tk.StringVar(value="AM")
+
+    # Hour
+    tk.Label(popup, text="Hour").pack()
+    hour_spin = tk.Spinbox(popup, from_=1, to=12, textvariable=hour_var, width=5)
+    hour_spin.pack()
+
+    # Minute
+    tk.Label(popup, text="Minute").pack()
+    minute_spin = tk.Spinbox(popup, from_=0, to=59, format="%02.0f", textvariable=minute_var, width=5)
+    minute_spin.pack()
+
+    # AM/PM
+    tk.OptionMenu(popup, ampm_var, "AM", "PM").pack()
+    def confirm_time():
+        global selected_time
+        hour = int(hour_var.get())
+        minute = minute_var.get()
+        ampm = ampm_var.get()
+    # Convert to 24-hour format
+        if ampm == "PM" and hour != 12:
+            hour += 12
+        if ampm == "AM" and hour == 12:
+            hour = 0
+
+        selected_time = f"{hour:02}:{minute}"
+        
+
+        popup.destroy()
+        save_task_with_time()
+    
+    
+    tk.Button(popup, text="OK", command=confirm_time).pack(pady=10)
 
 
 
 
 def add_task():#adding task to database and refreshing the listbox and calendar
+    global task,date,important
     task = task_entry.get()
     if not task.strip():
         return  # Do not add empty tasks
     date = cal.get_date()
     important = important_var.get()
     important_var.set(0)  # Reset the checkbox after adding the task
-    add_task_db(task, date, important)
+    open_time_picker()
+    
+    
+
+def save_task_with_time():
+    global task,important, date,selected_time
+    if selected_time is None:
+        return
+    add_task_db(task, date, important,selected_time)  # Add the task to the database
     load_all_tasks()  # Refresh the calendar events
     show_tasks()
     task_entry.delete(0, tk.END)
+    
 
 
 
@@ -45,7 +97,7 @@ task_list = tk.Listbox(root, width=50)
 task_list.pack(pady=10)
 
 
-def delete_task(event):#deleting task from database and refreshing the listbox and calendar
+def delete_task(event=None):#deleting task from database and refreshing the listbox and calendar
     selected = task_list.curselection()
     if not selected:
         return
@@ -100,6 +152,63 @@ def edit_task():
     show_tasks()  # Refresh the task list to reflect the change
     load_all_tasks()  # Refresh the calendar events to reflect the change
 
+def edit_due_time():
+    global selected_time
+    global popup
+    global task_id
+    selected=task_list.curselection()
+    if not selected:
+        return
+    index=selected[0]
+    task_id=task_ids[index]
+    popup = tk.Toplevel(root)
+    popup.title("Select Due Time For Task")
+    popup.geometry("250x150")
+
+    hour_var = tk.StringVar(value="12")
+    minute_var = tk.StringVar(value="00")
+    ampm_var = tk.StringVar(value="AM")
+
+    # Hour
+    tk.Label(popup, text="Hour").pack()
+    hour_spin = tk.Spinbox(popup, from_=1, to=12, textvariable=hour_var, width=5)
+    hour_spin.pack()
+
+    # Minute
+    tk.Label(popup, text="Minute").pack()
+    minute_spin = tk.Spinbox(popup, from_=0, to=59, format="%02.0f", textvariable=minute_var, width=5)
+    minute_spin.pack()
+
+    # AM/PM
+    tk.OptionMenu(popup, ampm_var, "AM", "PM").pack()
+    def confirm_time():
+        global selected_time
+        hour = int(hour_var.get())
+        minute = minute_var.get()
+        ampm = ampm_var.get()
+    # Convert to 24-hour format
+        if ampm == "PM" and hour != 12:
+            hour += 12
+        if ampm == "AM" and hour == 12:
+            hour = 0
+
+        selected_time = f"{hour:02}:{minute}"
+        
+
+        popup.destroy()
+        edit_due_time_db(task_id,selected_time)
+        show_tasks()
+        load_all_tasks()
+    
+    tk.Button(popup, text="OK", command=confirm_time).pack(pady=5)
+    
+   
+
+    
+    
+    
+    
+
 
 def toggle_importance():
     selected=task_list.curselection()
@@ -121,6 +230,10 @@ menu.add_separator()
 menu.add_command(label="Mark Complete/Incomplete ✅", command=mark_complete)
 menu.add_separator()
 menu.add_command(label="Toggle Importance ⭐", command=toggle_importance)
+menu.add_separator()
+menu.add_command(label="Change due time for task ⏱️", command=edit_due_time)
+menu.add_separator()
+
 
 def detect_menu(event):
     try:
@@ -159,9 +272,9 @@ def show_tasks(event=None,selected_date=None):#it is showing tasks for selected 
     if not tasks:
         return
     else:
-        for i,(task, status, imp,task_id )in enumerate(tasks,start=1):
+        for i,(task, status, imp,task_id ,task_time)in enumerate(tasks,start=1):
             task_ids.append(task_id)  # Store the task ID
-            label = f"{i}. {task}{'⭐ ' if imp else ''} ({   'Completed' if status else 'Not Completed'})"
+            label = f"{i}. {task}{'⭐ ' if imp else ''} ({   'Completed' if status else 'Not Completed'}) due at {task_time}"
             task_list.insert(tk.END, label)
 
 cal.bind("<<CalendarSelected>>", show_tasks)
@@ -206,7 +319,18 @@ def mark_single_date(date):#it is telling if any task is important or not for th
 
 
 
-para_box=tk.Text(root,width=50,height=5, font=("Arial", 12))
+
+
+
+
+
+
+
+
+
+
+
+para_box=tk.Text(root,width=100,height=5, font=("Arial", 12))
 para_box.pack(pady=10)
 para_box.insert(tk.END, "1. Double click on a task to mark it as completed or not completed.\n")
 para_box.insert(tk.END," \n")
