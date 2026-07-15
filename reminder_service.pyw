@@ -2,7 +2,7 @@ import time
 from datetime import date
 from datetime import datetime,timedelta
 from plyer import notification
-from basic_logic import fetch_data
+from basic_logic import fetch_data_reminder
 
 reminded_tasks = set()
 
@@ -17,7 +17,8 @@ def check_reminders():
 
     print(f"Checking reminders for {today}...")  # Debugging line
     
-    tasks = fetch_data()
+    tasks = fetch_data_reminder()
+    
     
     
 
@@ -33,9 +34,9 @@ def check_reminders():
         
         if due_date == today and status == 0:
             if imp:
-                rem_time=due_time-timedelta(minutes=2)
+                rem_time=due_time-timedelta(hours=2)
             else:
-                rem_time=due_time-timedelta(minutes=1)
+                rem_time=due_time-timedelta(hours=1)
    
             if task_id not in reminded_tasks and rem_time <= now < due_time:
                 print(f"Sending reminder for task: {task_name}")  # Debugging line
@@ -50,4 +51,4 @@ def check_reminders():
 
 while True:
     check_reminders()
-    time.sleep(5)  # check every 60 seconds
+    time.sleep(30)  # check every 60 seconds

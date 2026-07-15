@@ -6,6 +6,16 @@ def fetch_data():
     tasks = curr.fetchall()
     return tasks
 
+def fetch_data_reminder():
+    mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
+    curr= mydb.cursor()
+    curr.execute("select * from tasks")
+    tasks = curr.fetchall()
+    curr.close()
+    return tasks
+    
+
+
 
 
 
