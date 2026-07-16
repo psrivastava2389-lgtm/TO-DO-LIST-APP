@@ -1,3 +1,6 @@
+from google_auth import get_calendar_service
+from datetime import datetime, timedelta
+
 import mysql.connector
 mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
 curr= mydb.cursor()
@@ -13,6 +16,36 @@ def fetch_data_reminder():
     tasks = curr.fetchall()
     curr.close()
     return tasks
+
+
+def add_event(summary, description, due_date):
+    service = get_calendar_service()
+
+    event = {
+        'summary': summary,
+        'description': description,
+        'start': {
+            'dateTime': due_date.isoformat(),
+            'timeZone': 'Asia/Kolkata',
+        },
+        'end': {
+            'dateTime': (due_date + timedelta(hours=1)).isoformat(),
+            'timeZone': 'Asia/Kolkata',
+        },
+        'reminders': {
+    'useDefault': False,
+    'overrides': [
+        {'method': 'popup', 'minutes': 10},
+    ],
+}
+    }
+
+    event = service.events().insert(
+        calendarId='primary',
+        body=event
+    ).execute()
+
+    print("Event created:", event.get('htmlLink'))
     
 
 
@@ -26,6 +59,11 @@ def fetch_data_reminder():
 
 
 def add_task_db(task, due_date, important,due_time):
+    add_event(
+    summary=task,
+    description="From To-Do App",
+    due_date=datetime.strptime(f"{due_date} {due_time}", "%Y-%m-%d %H:%M")
+)
     
     curr.execute(
         "INSERT INTO tasks (task_name, status, important, due_date, due_time) VALUES (%s, %s, %s, %s, %s)",
