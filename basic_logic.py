@@ -79,7 +79,7 @@ def edit_event_name(event_id,new_description):
         service = get_calendar_service()
 
         event = service.events().get(calendarId='primary', eventId=event_id).execute()
-        
+        event['summary']=new_description
        
         updated_event = service.events().update(
             calendarId='primary',
