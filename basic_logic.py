@@ -6,17 +6,11 @@ from googleapiclient.errors import HttpError
 import mysql.connector
 mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
 curr= mydb.cursor()
+
+
 def fetch_data():
     mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
     curr= mydb.cursor()
-    
-    curr.execute("select * from tasks")
-    tasks = curr.fetchall()
-    return tasks
-
-def fetch_data_reminder():
-    mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
-    curr= mydb.cursor(buffered=True)
     curr.execute("select * from tasks")
     tasks = curr.fetchall()
     curr.close()
@@ -89,7 +83,7 @@ def edit_event_name(event_id,new_description):
         event = service.events().get(calendarId='primary', eventId=event_id).execute()
         event['summary']=new_description
        
-        updated_event = service.events().update(
+        service.events().update(
             calendarId='primary',
             eventId=event_id,
             body=event
@@ -109,12 +103,10 @@ def edit_event_importance(id,new_imp):
         service = get_calendar_service()
 
         event = service.events().get(calendarId='primary', eventId=id).execute()
-        desc=f"{event['description'].strip('\n')}\n{'⭐' if new_imp else ''}"
-        event['description'] = desc
         event_color="11" if new_imp else "9"
         event['colorId']=event_color
        
-        updated_event = service.events().update(
+        service.events().update(
             calendarId='primary',
             eventId=id,
             body=event
@@ -142,7 +134,7 @@ def edit_event_time(id,new_time,date):
             'dateTime': (due_time + timedelta(hours=1)).isoformat(),
             'timeZone': 'Asia/Kolkata',
         },     
-        updated_event = service.events().update(
+        service.events().update(
             calendarId='primary',
             eventId=id,
             body=event

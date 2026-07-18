@@ -32,7 +32,6 @@ def webhook():
 
     # Call your sync function here
     sync_calender()
-    print("hi")
 
 
     return '', 200

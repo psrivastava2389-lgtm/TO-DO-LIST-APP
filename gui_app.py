@@ -44,7 +44,7 @@ def open_time_picker():
     def confirm_time():
         global selected_time
         hour = int(hour_var.get())
-        minute = minute_var.get()
+        minute =int( minute_var.get())
         ampm = ampm_var.get()
     # Convert to 24-hour format
         if ampm == "PM" and hour != 12:
@@ -118,7 +118,7 @@ def delete_task(event=None):#deleting task from database and refreshing the list
 root.bind("<Delete>",delete_task)  # Bind the Delete key to delete_task function
 
 
-def mark_complete():
+def mark_complete(event=None):
     selected=task_list.curselection()
     if not selected:
         return
@@ -131,6 +131,8 @@ def mark_complete():
     toggle_task_status(task_id)  # Toggle the status in the database
     show_tasks()  # Refresh the task list to reflect the change
     load_all_tasks()  # Refresh the calendar events to reflect the change
+root.bind("<Double-Button-1>", mark_complete)  # Bind double-click to mark complete
+
 
 
 def edit_task():
@@ -260,7 +262,6 @@ task_list.bind("<Button-3>", detect_menu)  # Right-click to show the menu
 
 
 
-task_list.bind("<Double-Button-1>", lambda event: mark_complete())  # Bind double-click to mark complete
 
 
 def show_tasks(event=None,selected_date=None):#it is showing tasks for selected date in listbox
