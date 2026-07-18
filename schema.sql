@@ -1,4 +1,4 @@
-create database to_do_app;
+create database to_do_list;
 use to_do_app
 
 create table tasks (task_name varchar(1000),
