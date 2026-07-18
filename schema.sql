@@ -1,5 +1,5 @@
 create database to_do_list;
-use to_do_app
+use to_do_app;
 
 create table tasks (task_name varchar(1000),
 status DEFAULT=0,
