@@ -1,5 +1,5 @@
 from google_auth import get_calendar_service
-from datetime import datetime, timedelta
+from datetime import date,datetime, timedelta
 from googleapiclient.errors import HttpError
 
 
@@ -7,26 +7,34 @@ import mysql.connector
 mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
 curr= mydb.cursor()
 def fetch_data():
+    mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
+    curr= mydb.cursor()
+    
     curr.execute("select * from tasks")
     tasks = curr.fetchall()
     return tasks
 
 def fetch_data_reminder():
     mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
-    curr= mydb.cursor()
+    curr= mydb.cursor(buffered=True)
     curr.execute("select * from tasks")
     tasks = curr.fetchall()
     curr.close()
+    mydb.close()
     return tasks
 
 
 def add_event(summary, description,imp, due_date):
     service = get_calendar_service()
-    desc=f"{description}\n{'⭐' if imp else ''}"
+    desc=f"{description}"
     event_color="11" if imp else "9"
 
     event = {
         'summary': summary,
+        'extendedProperties': {
+        'private': {
+            'app': 'todo_app'
+        }},
         'description': desc,
         'colorId':event_color,
         'start': {
@@ -145,7 +153,47 @@ def edit_event_time(id,new_time,date):
     except Exception as e:
         print(f"Failed to update Google Calendar event: {e}")
 
+def sync_calender():
+    mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
+    curr= mydb.cursor()
+    
+    events = get_calendar_service().events().list(calendarId='primary').execute()
+    event_map={}    
+    for e in events.get('items',[]):
+        if e.get('extendedProperties',{}).get('private',{}).get('app')=='todo_app':
+            event_map[e['id']]=e
+    tasks = fetch_data()
+   
 
+    for task in tasks:
+        if task[6] not in event_map :
+            curr.execute("DELETE FROM tasks WHERE google_id=%s", (task[6],))
+        else:
+            e=event_map[task[6]]
+            update_db(e.get('summary'),e.get('colorId'),e.get('id'),e.get('start',{}).get('dateTime'))
+    mydb.commit()
+    curr.close()
+    mydb.close()
+
+
+def update_db(name,color,g_id,time):
+    mydb = mysql.connector.connect(host="localhost", user="root", password="123456",database="to_do_list")
+    curr= mydb.cursor()
+
+    imp='1' if color=='11' else 0
+    due_time=(datetime.fromisoformat(time)).time()
+    curr.execute("update tasks set task_name = %s, important=%s, due_time=%s where google_id=%s",(name,imp,due_time,g_id))
+    mydb.commit()
+            
+
+
+
+        
+
+    
+        
+
+    
 
 
     

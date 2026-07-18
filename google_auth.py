@@ -20,7 +20,10 @@ def get_calendar_service():
             token.write(creds.to_json())
 
     service = build('calendar', 'v3', credentials=creds)
+    
+
     return service
+
 if __name__ == "__main__":
     service = get_calendar_service()
     print("Service created successfully!")
