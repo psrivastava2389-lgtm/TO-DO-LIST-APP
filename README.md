@@ -10,13 +10,13 @@ This is a desktop-based application that allows user to add a task and track it 
 <br>
 Features:
 <br>
-1) Task Management (Add, edit, delete, mark important, mark complete).
+1. Task Management (Add, edit, delete, mark important, mark complete).
 <br>
-2) Desktop Notifications for due task (1hr before an important task and 2 hr before a normal task).
+2. Desktop Notifications for due task (1hr before an important task and 2 hr before a normal task).
 <br>
-3) Google calender integration (user's tasks are visible on google calender too).
+3. Google calender integration (user's tasks are visible on google calender too).
 <br>
-4) Real-time sync using webhook system.
+4. Real-time sync using webhook system.
 <br>
 
 
@@ -107,23 +107,23 @@ Webhooks require a public URL , Ngrok is used to expose the application's local 
 
 #SETUP INSTRUCTIONS
 <br>
-1) Clone repository
+1. Clone repository
 <br>
    git clone <https://github.com/psrivastava2389-lgtm/TO-DO-LIST-APP.git>
    cd project
    <br>
 
-3) Install dependencies
+2. Install dependencies
 <br>
    pip install mysql-connector-python plyer flask pyngrok google-api-python-client google-auth-httplib2      google-auth-oauthlib
    <br>
 
-5) Setup MySQL
+3. Setup MySQL
 <br>
    SOURCE schema.sql;
    <br>
 
-7) Setup Google Calender API
+4. Setup Google Calender API
 <br>
    1. Go to Google Cloud Console  
 <br>
@@ -138,13 +138,13 @@ Webhooks require a public URL , Ngrok is used to expose the application's local 
    6. Place it in project folder
 <br>
 
-9) Start Ngrok
+5. Start Ngrok
 <br>
    ngrok http 5000
    copy the HTTP URK and use in webhook setup
     <br>
 
-11) Setup Notification system
+6. Setup Notification system
    <br>
    1. run 'where pythonw' in CMD.
    <br>
@@ -157,7 +157,7 @@ Webhooks require a public URL , Ngrok is used to expose the application's local 
    5. save it.
  <br>
 
-11) Run the application- run the required components simultaneously:
+7. Run the application- run the required components simultaneously:
     <br>
    1. python gui_app.py
     <br>
