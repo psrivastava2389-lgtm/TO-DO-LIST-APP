@@ -2,8 +2,10 @@
 <br>
 > A TO_DO list desktop based application to track daily tasks, recieve notification for tasks as well as contains google calender imtegration.
 <br>
+
 ##Description
 <br>
+
 This is a desktop-based application that allows user to add a task and track it accordingly. It also provides background reminders for the tasks as it's due time reaches. It is also integrated with google calender and allows 2 way sync of data.
 <br>
 Features:
@@ -16,6 +18,8 @@ Features:
 <br>
 4) Real-time sync using webhook system.
 <br>
+
+
 #GUI(Tkinter)
 <br>
 The application use Tkinter, python's built in GUI library, to provide simple and interactice interface.
@@ -33,6 +37,7 @@ The application use Tkinter, python's built in GUI library, to provide simple an
 - Visual indication of important tasks
 <br>
 
+
 #Flask
 <br>
 The application uses Flask to built lightweight server (webhook_server.py) that sits, wait and listen for updates from google calender on any changes in it.
@@ -43,6 +48,7 @@ The application uses Flask to built lightweight server (webhook_server.py) that 
 <br>
 - Triggers database sync
 <br>
+
 
 #Ngrok
 <br>
@@ -61,8 +67,6 @@ Webhooks require a public URL , Ngrok is used to expose the application's local 
 <br>
 4. App updates MySQL database accordingly
 <br>
-
-
 
 
 #TECH STACK
@@ -162,6 +166,7 @@ Webhooks require a public URL , Ngrok is used to expose the application's local 
    3. ngrok http 5000
  <br>
 
+
 ##Important Notes
  <br>
 
@@ -187,6 +192,7 @@ Webhooks require a public URL , Ngrok is used to expose the application's local 
   <br>
 - Persistent webhook hosting (instead of Ngrok)
   <br>
+
 
 #AUTHOR 
 <br>
