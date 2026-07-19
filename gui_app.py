@@ -80,7 +80,7 @@ def save_task_with_time():
     global task,important, date,selected_time
     if selected_time is None:
         return
-    add_task_db(task, date, important,selected_time)  # Add the task to the database
+    add_task_db(task, date, important,selected_time)
     load_all_tasks()  # Refresh the calendar events
     show_tasks()
     task_entry.delete(0, tk.END)

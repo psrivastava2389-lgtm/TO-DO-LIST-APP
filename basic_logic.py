@@ -207,8 +207,7 @@ def add_task_db(task, due_date, important,due_time):
     summary=task,
     description="From TO_DO app",
     imp=important,
-    due_date=datetime.strptime(f"{due_date} {due_time}", "%Y-%m-%d %H:%M")
-)
+    due_date=datetime.strptime(f"{due_date} {due_time}", "%Y-%m-%d %H:%M"))
     
     curr.execute(
         "INSERT INTO tasks (task_name, status, important, due_date, due_time,google_id) VALUES (%s, %s, %s, %s, %s,%s)",
